@@ -1,11 +1,12 @@
 # Helper file to calibrate the hardware
 
 import time
-import yaml
-import numpy as np
+
 import matplotlib.pyplot as plt
-from scipy.stats import linregress
+import numpy as np
+import yaml
 from interface import Interface
+from scipy.stats import linregress
 
 CALI_PATH = "calibrations/"
 

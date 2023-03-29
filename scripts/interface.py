@@ -2,8 +2,9 @@
 # to run the morbidostat. Eventually the low level functions will have to be taken care of with the `asyncio`
 # library.
 
-import numpy as np
 import time
+
+import numpy as np
 import yaml
 
 MOCK = True

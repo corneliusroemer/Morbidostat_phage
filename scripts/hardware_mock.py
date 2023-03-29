@@ -1,13 +1,9 @@
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals,
-)
-import random
-import time
-import re
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import platform
+import random
+import re
+import time
 
 
 class IOPi(object):

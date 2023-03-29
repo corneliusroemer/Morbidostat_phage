@@ -1,8 +1,10 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from smbus import SMBus
-import time
-import re
+
 import platform
+import re
+import time
+
+from smbus import SMBus
 
 
 class IOPi(object):
