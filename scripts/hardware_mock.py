@@ -1,5 +1,9 @@
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (
+    absolute_import,
+    division,
+    print_function,
+    unicode_literals,
+)
 import random
 import time
 import re
@@ -96,7 +100,6 @@ class IOPi(object):
 
         self.__ioaddress = address
         return
-
 
     @staticmethod
     def __checkbit(byte, bit):
@@ -252,7 +255,7 @@ class IOPi(object):
         if value >= 0x0000 and value <= 0xFFFF:
             self.__bus.write_word_data(self.__ioaddress, a_register, value)
         else:
-            raise ValueError('value out of range: 0 to 65535 (0xFFFF)')
+            raise ValueError("value out of range: 0 to 65535 (0xFFFF)")
         return
 
     # public methods
@@ -591,8 +594,9 @@ class IOPi(object):
         :return: 1 = Active-high.  0 = Active-low.
         :rtype: int
         """
-        return self.__checkbit(self.__bus.read_byte_data(self.__ioaddress,
-                                                         self.IOCON), 1)
+        return self.__checkbit(
+            self.__bus.read_byte_data(self.__ioaddress, self.IOCON), 1
+        )
 
     def set_interrupt_type(self, port, value):
         """
@@ -756,11 +760,13 @@ class IOPi(object):
 # --- ADCPi ---
 class Error(Exception):
     """Base class for exceptions in this module."""
+
     pass
 
 
 class TimeoutError(Error):
     """The operation exceeded the given deadline."""
+
     pass
 
 
@@ -786,15 +792,14 @@ class ADCPi(object):
         if address >= 0x68 and address <= 0x6F:
             self.__adc1_address = address
         else:
-            raise ValueError('address out of range 0x68 to 0x6F')
+            raise ValueError("address out of range 0x68 to 0x6F")
 
         if address2 >= 0x68 and address2 <= 0x6F:
             self.__adc2_address = address2
         else:
-            raise ValueError('address2 out of range 0x68 to 0x6F')
-        
-        self.set_bit_rate(rate)
+            raise ValueError("address2 out of range 0x68 to 0x6F")
 
+        self.set_bit_rate(rate)
 
     def read_voltage(self, channel):
         """
@@ -806,7 +811,9 @@ class ADCPi(object):
         :rtype: float
         """
         if channel < 1 or channel > 8:
-            raise ValueError('read_voltage: channel out of range (1 to 8 allowed)')
+            raise ValueError(
+                "read_voltage: channel out of range (1 to 8 allowed)"
+            )
 
         print(f"[ADCPi] Reading voltage from channel: {channel}")
         random_voltage = random.uniform(0, 5)
@@ -838,8 +845,8 @@ class ADCPi(object):
             # bit 0 = 1, bit 1 = 1
             pass
         else:
-            raise ValueError('set_pga: gain out of range')
-        
+            raise ValueError("set_pga: gain out of range")
+
         print("[ADCPi] Setting PGA gain to: " + str(gain))
 
         return
@@ -864,7 +871,7 @@ class ADCPi(object):
         elif rate == 18:
             pass
         else:
-            raise ValueError('set_bit_rate: rate out of range')
+            raise ValueError("set_bit_rate: rate out of range")
 
         print("[ADCPi] Setting bit rate to: " + str(rate))
         return
