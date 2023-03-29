@@ -9,6 +9,7 @@ from interface import Interface
 
 CALI_PATH = "calibrations/"
 
+
 # ENH: Save calibration state after every standard -> can resume if interrupted/errors
 def calibrate_OD(
     interface: Interface,
@@ -34,9 +35,7 @@ def calibrate_OD(
         lag: time between voltage measures in seconds. Defaults to 0.1.
         voltage_threshold: Used to estimate if there is overflow and exclude data point [V]. Defaults to 4.8.
     """
-    assert (
-        nb_standards >= 2
-    ), "At least 2 OD standards are needed for the calibration."
+    assert nb_standards >= 2, "At least 2 OD standards are needed for the calibration."
 
     # ENH: Factor out measurement and fit code into separate functions
     ODs = []
@@ -54,10 +53,12 @@ def calibrate_OD(
             ODs.append(float(cur_OD))
             no_valid_standard = False
 
-        for i, vial in enumerate(vials):  # iterating over all vials for the current OD standard
+        for i, vial in enumerate(
+            vials
+        ):  # iterating over all vials for the current OD standard
             input(
                 "   Place OD standard in vial slot "
-                + str(vial) # 1-indexed
+                + str(vial)  # 1-indexed
                 + ", press enter when done"
             )
             # Q: Maybe better to switch light on within measure -> any point in measure without light? Probably no
@@ -80,7 +81,9 @@ def calibrate_OD(
     # Computing the fit for all vials
     for nb_standard, vial in enumerate(vials):
         good_measurements = voltages[:, nb_standard] < voltage_threshold
-        if good_measurements.sum() > 1: # Q: Sum is weird, want to look at length here no?
+        if (
+            good_measurements.sum() > 1
+        ):  # Q: Sum is weird, want to look at length here no?
             slope, intercept, _, _, _ = linregress(
                 ODs[good_measurements], voltages[good_measurements, nb_standard]
             )
@@ -107,6 +110,7 @@ def calibrate_OD(
     plt.xlabel("OD standard [a.u.]")
     plt.ylabel("Voltage [V]")
     plt.show()
+
 
 # Q: Would it not be better to specify pump volume and rate rather than time?
 def calibrate_weight_sensors(
@@ -139,7 +143,7 @@ def calibrate_weight_sensors(
     """
 
     assert (
-        len(pump_times) >= 2 # Q: You mean less than or less than or equal?
+        len(pump_times) >= 2  # Q: You mean less than or less than or equal?
     ), "Cannot calibrate weight sensors with less than 2 pumping times."
 
     print(f"\nStarting calibration for weight sensors of vials {vials}.")
@@ -155,13 +159,9 @@ def calibrate_weight_sensors(
 
     for i, vial in enumerate(vials):
         print()
-        input(
-            f"Put outlet of pump {pump} in the vial {vial}, then press enter."
-        )
+        input(f"Put outlet of pump {pump} in the vial {vial}, then press enter.")
         tot_time = 0
-        voltages[0, i] = interface.measure_weight(
-            vial
-        )  # empty vial
+        voltages[0, i] = interface.measure_weight(vial)  # empty vial
         print(f"    Empty vial voltage: {voltages[0,i]}")
 
         # Why not pump and measure more often? E.g. 2s on, 1s off etc?
@@ -169,13 +169,9 @@ def calibrate_weight_sensors(
             dt = t - tot_time
             interface._run_pump(pump, dt)
             time.sleep(1)
-            voltages[j + 1, i] = interface.measure_weight(
-                vial
-            )  # after pumping
+            voltages[j + 1, i] = interface.measure_weight(vial)  # after pumping
             tot_time = t
-            print(
-                f"    Measuring voltage after {tot_time}s: {voltages[j+1, i]}"
-            )
+            print(f"    Measuring voltage after {tot_time}s: {voltages[j+1, i]}")
 
         print(f"Calibration of weight sensor {vial} done.")
 
@@ -217,9 +213,7 @@ def calibrate_weight_sensors(
     plt.show()
 
 
-def calibrate_pumps(
-    interface: Interface, filename: str, pumps: list, dt: float = 30
-):
+def calibrate_pumps(interface: Interface, filename: str, pumps: list, dt: float = 30):
     """Function to perform the calibration of the pumps. For now it is done by connecting all the pumps and
     putting their inlet in water and their outlet on the scale. Then each pump is run for dt seconds and the
     user is asked for the new weight. Pumping rates are inferred from the difference in weights.
@@ -236,9 +230,7 @@ def calibrate_pumps(
     )  # Pumps are columns, first line is weight before and second is after
 
     print(f"\nStarting pump calibration for pumps {pumps}.")
-    print(
-        "Put inlet of all pumps in water. Put outlet of pumps in vial on a balance"
-    )
+    print("Put inlet of all pumps in water. Put outlet of pumps in vial on a balance")
 
     input(
         "When the setup is ready press enter. It will run all the pumps for 20s to fill the tubing."
@@ -251,9 +243,7 @@ def calibrate_pumps(
     # All vials weigh the same?
     # Improvement: run all pumps in parallel
     weight = input("Initial weight of vial: ")
-    for i, pump in enumerate(
-        pumps
-    ):  # iterate over all pumps and asks for weights
+    for i, pump in enumerate(pumps):  # iterate over all pumps and asks for weights
         print(f"Calibrating pump {pump}")
         weights[0, i] = weight
         interface._run_pump(pump, dt)
@@ -270,9 +260,7 @@ def calibrate_pumps(
     np.savetxt(CALI_PATH + filename, pump_rates)
 
 
-def group_calibrations(
-    cali_OD: str, cali_WS: str, cali_pumps: str, output: str
-):
+def group_calibrations(cali_OD: str, cali_WS: str, cali_pumps: str, output: str):
     fits_OD = np.loadtxt(CALI_PATH + cali_OD)
     fits_WS = np.loadtxt(CALI_PATH + cali_WS)
     rate_pumps = np.loadtxt(CALI_PATH + cali_pumps)

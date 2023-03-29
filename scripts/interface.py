@@ -53,7 +53,6 @@ class Interface:
     # - set_pin_direction(self, pin, direction)
     # - write_pin(self, pin, value)
 
-
     def set_hardware_connections(self) -> None:
         """This function defines the physical connection from the different components to the pin of the RPi."""
 
