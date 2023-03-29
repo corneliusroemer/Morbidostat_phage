@@ -590,9 +590,7 @@ class IOPi(object):
         :return: 1 = Active-high.  0 = Active-low.
         :rtype: int
         """
-        return self.__checkbit(
-            self.__bus.read_byte_data(self.__ioaddress, self.IOCON), 1
-        )
+        return self.__checkbit(self.__bus.read_byte_data(self.__ioaddress, self.IOCON), 1)
 
     def set_interrupt_type(self, port, value):
         """
@@ -807,9 +805,7 @@ class ADCPi(object):
         :rtype: float
         """
         if channel < 1 or channel > 8:
-            raise ValueError(
-                "read_voltage: channel out of range (1 to 8 allowed)"
-            )
+            raise ValueError("read_voltage: channel out of range (1 to 8 allowed)")
 
         print(f"[ADCPi] Reading voltage from channel: {channel}")
         random_voltage = random.uniform(0, 5)

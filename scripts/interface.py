@@ -128,9 +128,7 @@ class Interface:
         dt = self._volume_to_time(pump, volume)
         self._run_pump(pump, dt)
 
-    def measure_weight(
-        self, vial: int, lag: float = 0.01, nb_measures: int = 1
-    ) -> None:
+    def measure_weight(self, vial: int, lag: float = 0.01, nb_measures: int = 1) -> None:
         """Measures the mean weight (in grams) over nb_measures from given vial.
 
         Args:
@@ -199,9 +197,7 @@ class Interface:
             t: time (in seconds) to pump the given volume.
         """
         available_pumps = list(range(1, len(self.pumps) + 1))
-        assert (
-            pump in available_pumps
-        ), f"Pump {pump} is not in the available pumps {available_pumps}"
+        assert pump in available_pumps, f"Pump {pump} is not in the available pumps {available_pumps}"
 
         t = volume / self.calibration["pumps"][f"pump {pump}"]["rate"]["value"]
         return t
@@ -216,9 +212,7 @@ class Interface:
         Returns:
             OD: OD600 corresponding to the voltage measured for the given vial.
         """
-        assert (
-            vial in self.vials
-        ), f"Vial {vial} is not in the available vials: {self.vials}"
+        assert vial in self.vials, f"Vial {vial} is not in the available vials: {self.vials}"
 
         slope = self.calibration["OD"][f"vial {vial}"]["slope"]["value"]
         intercept = self.calibration["OD"][f"vial {vial}"]["intercept"]["value"]
@@ -236,9 +230,7 @@ class Interface:
         Returns:
             weight: weight in grams corresponding to the voltage measured for the given vial.
         """
-        assert (
-            vial in self.vials
-        ), f"Vial {vial} is not in the available vials: {self.vials}"
+        assert vial in self.vials, f"Vial {vial} is not in the available vials: {self.vials}"
 
         slope = self.calibration["WS"][f"vial {vial}"]["slope"]["value"]
         intercept = self.calibration["WS"][f"vial {vial}"]["intercept"]["value"]
@@ -273,9 +265,7 @@ class Interface:
             pin: physical pin on the IOPi
         """
         available_pumps = list(range(1, len(self.pumps) + 1))
-        assert (
-            pump in available_pumps
-        ), f"Pump {pump} is not in the available pumps {available_pumps}"
+        assert pump in available_pumps, f"Pump {pump} is not in the available pumps {available_pumps}"
 
         return self.pumps[pump - 1]["IOPi"], self.pumps[pump - 1]["pin"]
 
@@ -290,9 +280,7 @@ class Interface:
             ADCPi: ADCPi number (first ADCPi means self.adcs[0])
             pin: physical pin on the ADCPi
         """
-        assert (
-            vial_number in self.vials
-        ), f"Vial, {vial_number} is not in the available vials: {self.vials}"
+        assert vial_number in self.vials, f"Vial, {vial_number} is not in the available vials: {self.vials}"
 
         return (
             self.weight_sensors[vial_number - 1]["ADCPi"],
@@ -310,9 +298,7 @@ class Interface:
             ADCPi: ADCPi number (first ADCPi means self.adcs[0])
             pin: physical pin on the ADCPi
         """
-        assert (
-            vial_number in self.vials
-        ), f"Vial, {vial_number} is not in the available vials: {self.vials}"
+        assert vial_number in self.vials, f"Vial, {vial_number} is not in the available vials: {self.vials}"
 
         return self.ODs[vial_number - 1]["ADCPi"], self.ODs[vial_number - 1]["pin"]
 
@@ -329,9 +315,7 @@ class Interface:
         assert adcpi in list(
             range(1, len(self.adcs) + 1)
         ), f"ADCPi {adcpi} isn't in define ADCs: {list(range(1,len(self.adcs)+1))}"
-        assert adc_pin in list(
-            range(1, 9)
-        ), f"ADC pin {adc_pin} isn't in available pins {list(range(1,9))}"
+        assert adc_pin in list(range(1, 9)), f"ADC pin {adc_pin} isn't in available pins {list(range(1,9))}"
 
         return self.adcs[adcpi - 1].read_voltage(adc_pin)
 

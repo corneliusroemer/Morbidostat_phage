@@ -654,9 +654,7 @@ class IOPi(object):
         :return: 1 = Active-high.  0 = Active-low.
         :rtype: int
         """
-        return self.__checkbit(
-            self.__bus.read_byte_data(self.__ioaddress, self.IOCON), 1
-        )
+        return self.__checkbit(self.__bus.read_byte_data(self.__ioaddress, self.IOCON), 1)
 
     def set_interrupt_type(self, port, value):
         """
@@ -909,9 +907,7 @@ class ADCPi(object):
         try:
             return SMBus(i2c__bus)
         except FileNotFoundError:
-            raise FileNotFoundError(
-                "Bus not found.  Check that you have selected the correct I2C bus."
-            )
+            raise FileNotFoundError("Bus not found.  Check that you have selected the correct I2C bus.")
         except OSError as err:
             raise ("OS error: {0}".format(err))
         except IOError as err:

@@ -54,37 +54,23 @@ def calibrate_OD(
             ODs.append(float(cur_OD))
             no_valid_standard = False
 
-        for i, vial in enumerate(
-            vials
-        ):  # iterating over all vials for the current OD standard
-            input(
-                "   Place OD standard in vial slot "
-                + str(vial)  # 1-indexed
-                + ", press enter when done"
-            )
+        for i, vial in enumerate(vials):  # iterating over all vials for the current OD standard
+            input("   Place OD standard in vial slot " + str(vial) + ", press enter when done")  # 1-indexed
             # Q: Maybe better to switch light on within measure -> any point in measure without light? Probably no
             interface.switch_light(True)
-            voltages[nb_standard][i] = interface.measure_OD(
-                vial, lag, nb_measures
-            )  # Measuring voltage
+            voltages[nb_standard][i] = interface.measure_OD(vial, lag, nb_measures)  # Measuring voltage
             interface.switch_light(False)
             print(f"   Mean voltage measured: {voltages[nb_standard][i]}V")
 
-    print(
-        "\nCalibration measurements complete. Now calculating voltage -> OD conversion."
-    )
+    print("\nCalibration measurements complete. Now calculating voltage -> OD conversion.")
     ODs = np.array(ODs)
     # Maybe use list of dicts instead of np array for more explicit code?
-    fit_parameters = np.zeros(
-        (len(vials), 2)
-    )  # first columns are slope, second are intercepts
+    fit_parameters = np.zeros((len(vials), 2))  # first columns are slope, second are intercepts
 
     # Computing the fit for all vials
     for nb_standard, vial in enumerate(vials):
         good_measurements = voltages[:, nb_standard] < voltage_threshold
-        if (
-            good_measurements.sum() > 1
-        ):  # Q: Sum is weird, want to look at length here no?
+        if good_measurements.sum() > 1:  # Q: Sum is weird, want to look at length here no?
             slope, intercept, _, _, _ = linregress(
                 ODs[good_measurements], voltages[good_measurements, nb_standard]
             )
@@ -100,9 +86,7 @@ def calibrate_OD(
         fit_parameters[nb_standard, 0] = slope
         fit_parameters[nb_standard, 1] = intercept
 
-    print(
-        f"Calibration completed. Saving results in file {filename} and plotting results."
-    )
+    print(f"Calibration completed. Saving results in file {filename} and plotting results.")
     np.savetxt(CALI_PATH + filename, fit_parameters)
 
     # make figure showing calibration
@@ -148,9 +132,7 @@ def calibrate_weight_sensors(
     ), "Cannot calibrate weight sensors with less than 2 pumping times."
 
     print(f"\nStarting calibration for weight sensors of vials {vials}.")
-    input(
-        f"Put the inlet and outlet of pump {pump} in water to pre-fill the tubes, then press enter."
-    )
+    input(f"Put the inlet and outlet of pump {pump} in water to pre-fill the tubes, then press enter.")
 
     print(f"Running pump {pump} for 15 seconds.")
     interface._run_pump(pump, 15)
@@ -177,31 +159,20 @@ def calibrate_weight_sensors(
         print(f"Calibration of weight sensor {vial} done.")
 
     # Computing the fit for all vials
-    weights = (
-        np.array([0] + pump_times) * pumping_rate + empty_vial_weight
-    )  # these are in grams
-    fit_parameters = np.zeros(
-        (len(vials), 2)
-    )  # first columns are slope, second are intercepts
+    weights = np.array([0] + pump_times) * pumping_rate + empty_vial_weight  # these are in grams
+    fit_parameters = np.zeros((len(vials), 2))  # first columns are slope, second are intercepts
 
     for i, vial in enumerate(vials):
         good_measurements = voltages[:, i] < voltage_threshold
         if good_measurements.sum() > 1:
-            slope, intercept, _, _, _ = linregress(
-                weights[good_measurements], voltages[good_measurements, i]
-            )
+            slope, intercept, _, _, _ = linregress(weights[good_measurements], voltages[good_measurements, i])
         else:
-            print(
-                "Less than 2 good measurements, also using saturated measurements for vial"
-                + str(vial)
-            )
+            print("Less than 2 good measurements, also using saturated measurements for vial" + str(vial))
             slope, intercept, _, _, _ = linregress(weights, voltages[:, i])
         fit_parameters[i, 0] = slope
         fit_parameters[i, 1] = intercept
 
-    print(
-        f"Calibration completed. Saving results in file {filename} and plotting results."
-    )
+    print(f"Calibration completed. Saving results in file {filename} and plotting results.")
     # It seems like you are not saving the number of the vial? Only the index in the list?
     np.savetxt(CALI_PATH + filename, fit_parameters)
 
@@ -226,16 +197,12 @@ def calibrate_pumps(interface: Interface, filename: str, pumps: list, dt: float 
         pumps: list of the pumps to calibrate.
         dt: Pumping time for the calibration in seconds. Defaults to 10.
     """
-    weights = np.zeros(
-        (2, len(pumps))
-    )  # Pumps are columns, first line is weight before and second is after
+    weights = np.zeros((2, len(pumps)))  # Pumps are columns, first line is weight before and second is after
 
     print(f"\nStarting pump calibration for pumps {pumps}.")
     print("Put inlet of all pumps in water. Put outlet of pumps in vial on a balance")
 
-    input(
-        "When the setup is ready press enter. It will run all the pumps for 20s to fill the tubing."
-    )
+    input("When the setup is ready press enter. It will run all the pumps for 20s to fill the tubing.")
     # Improvement: run pumps in parallel
     for pump in pumps:
         print(f"Running pump {pump}")
@@ -289,9 +256,7 @@ def group_calibrations(cali_OD: str, cali_WS: str, cali_pumps: str, output: str)
 
     cali_pumps = {}
     for ii in range(rate_pumps.shape[0]):
-        cali_pumps[f"pump {ii+1}"] = {
-            "rate": {"value": float(rate_pumps[ii]), "units": "mL.s^-1"}
-        }
+        cali_pumps[f"pump {ii+1}"] = {"rate": {"value": float(rate_pumps[ii]), "units": "mL.s^-1"}}
     calibration_dict["pumps"] = cali_pumps
 
     with open(CALI_PATH + output + ".yaml", "w") as f:
@@ -307,9 +272,7 @@ if __name__ == "__main__":
     # Like plotting only
     try:
         interface = Interface()
-        choice = input(
-            "What would you like to calibrate ? [OD, pumps, WS, concatenate]: "
-        )
+        choice = input("What would you like to calibrate ? [OD, pumps, WS, concatenate]: ")
         if choice == "OD":
             calibrate_OD(interface, "OD.txt", nb_standards=5, vials=[1, 2])
         elif choice == "pumps":
@@ -321,9 +284,7 @@ if __name__ == "__main__":
             date_string = f"{format(t.tm_mon, '02d')}-{format(t.tm_mday, '02d')}-{format(t.tm_hour,'02d')}h-{format(t.tm_min, '02d')}min"
             group_calibrations("OD.txt", "WS.txt", "pumps.txt", date_string)
         else:
-            print(
-                f"{choice} is not in the available actions: [OD, pumps, WS, concatenate]"
-            )
+            print(f"{choice} is not in the available actions: [OD, pumps, WS, concatenate]")
 
     finally:  # This executes among program exiting (error or pressing ctrl+C)
         interface.turn_off()
