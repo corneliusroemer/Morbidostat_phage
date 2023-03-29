@@ -5,7 +5,12 @@
 import numpy as np
 import time
 import yaml
-from hardware_libraries import ADCPi, IOPi
+
+MOCK = True
+if MOCK is False:
+    from hardware_libraries import ADCPi, IOPi
+else:
+    from hardware_mock import ADCPi, IOPi
 
 
 class Interface:
@@ -39,6 +44,15 @@ class Interface:
         self.turn_off()
 
     # --- Hardware setup ---
+
+    # The following ADCPi functions are used:
+    # - set_pga(self, gain)
+    # - read_voltage(self, channel)
+
+    # The following IOPi functions are used:
+    # - set_pin_direction(self, pin, direction)
+    # - write_pin(self, pin, value)
+
 
     def set_hardware_connections(self) -> None:
         """This function defines the physical connection from the different components to the pin of the RPi."""
@@ -247,6 +261,7 @@ class Interface:
 
     # --- Low level functions ---
 
+    # Q: Wrong return type
     def _pump_to_pin(self, pump: int) -> int:
         """Return the IOPi and pin number associated to the pump.
 
@@ -264,6 +279,7 @@ class Interface:
 
         return self.pumps[pump - 1]["IOPi"], self.pumps[pump - 1]["pin"]
 
+    # Q: Wrong return type
     def _WS_to_pin(self, vial_number: int) -> int:
         """Returns the ADCPi and pin number of the weight sensor associated to the vial.
 
@@ -283,6 +299,7 @@ class Interface:
             self.weight_sensors[vial_number - 1]["pin"],
         )
 
+    # Q: Wrong return type
     def _OD_to_pin(self, vial_number: int) -> int:
         """Returns the ADCPi and pin number of the OD associated to the vial.
 
