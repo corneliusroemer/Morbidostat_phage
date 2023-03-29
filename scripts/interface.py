@@ -41,8 +41,7 @@ class Interface:
     # --- Hardware setup ---
 
     def set_hardware_connections(self) -> None:
-        """This function defines the physical connection from the different components to the pin of the RPi.
-        """
+        """This function defines the physical connection from the different components to the pin of the RPi."""
 
         self.adcs = [ADCPi(0x68, 0x69, 18)]
         for adc in self.adcs:
@@ -72,7 +71,7 @@ class Interface:
         """
 
         # Opening file as a dictionary
-        with open("calibrations/" + file, 'r') as stream:
+        with open("calibrations/" + file, "r") as stream:
             self.calibration = yaml.load(stream, Loader=yaml.loader.BaseLoader)
 
         # Converting values from string to floats
@@ -80,7 +79,8 @@ class Interface:
             for key2 in self.calibration[key1].keys():
                 for key3 in self.calibration[key1][key2].keys():
                     self.calibration[key1][key2][key3]["value"] = float(
-                        self.calibration[key1][key2][key3]["value"])
+                        self.calibration[key1][key2][key3]["value"]
+                    )
 
     # --- High level functions ---
 
@@ -114,7 +114,9 @@ class Interface:
         dt = self._volume_to_time(pump, volume)
         self._run_pump(pump, dt)
 
-    def measure_weight(self, vial: int, lag: float = 0.01, nb_measures: int = 1) -> None:
+    def measure_weight(
+        self, vial: int, lag: float = 0.01, nb_measures: int = 1
+    ) -> None:
         """Measures the mean weight (in grams) over nb_measures from given vial.
 
         Args:
@@ -163,8 +165,7 @@ class Interface:
         self.iobuses[self.lights["IOPi"] - 1].write_pin(self.lights["pin"], state)
 
     def turn_off(self) -> None:
-        """Turns everything controlled by the interface to off state.
-        """
+        """Turns everything controlled by the interface to off state."""
         for pump in range(1, len(self.pumps) + 1):
             IOPi, pin = self._pump_to_pin(pump)
             self.iobuses[IOPi - 1].write_pin(pin, 0)
@@ -184,7 +185,9 @@ class Interface:
             t: time (in seconds) to pump the given volume.
         """
         available_pumps = list(range(1, len(self.pumps) + 1))
-        assert pump in available_pumps, f"Pump {pump} is not in the available pumps {available_pumps}"
+        assert (
+            pump in available_pumps
+        ), f"Pump {pump} is not in the available pumps {available_pumps}"
 
         t = volume / self.calibration["pumps"][f"pump {pump}"]["rate"]["value"]
         return t
@@ -199,7 +202,9 @@ class Interface:
         Returns:
             OD: OD600 corresponding to the voltage measured for the given vial.
         """
-        assert vial in self.vials, f"Vial {vial} is not in the available vials: {self.vials}"
+        assert (
+            vial in self.vials
+        ), f"Vial {vial} is not in the available vials: {self.vials}"
 
         slope = self.calibration["OD"][f"vial {vial}"]["slope"]["value"]
         intercept = self.calibration["OD"][f"vial {vial}"]["intercept"]["value"]
@@ -217,7 +222,9 @@ class Interface:
         Returns:
             weight: weight in grams corresponding to the voltage measured for the given vial.
         """
-        assert vial in self.vials, f"Vial {vial} is not in the available vials: {self.vials}"
+        assert (
+            vial in self.vials
+        ), f"Vial {vial} is not in the available vials: {self.vials}"
 
         slope = self.calibration["WS"][f"vial {vial}"]["slope"]["value"]
         intercept = self.calibration["WS"][f"vial {vial}"]["intercept"]["value"]
@@ -251,7 +258,9 @@ class Interface:
             pin: physical pin on the IOPi
         """
         available_pumps = list(range(1, len(self.pumps) + 1))
-        assert pump in available_pumps, f"Pump {pump} is not in the available pumps {available_pumps}"
+        assert (
+            pump in available_pumps
+        ), f"Pump {pump} is not in the available pumps {available_pumps}"
 
         return self.pumps[pump - 1]["IOPi"], self.pumps[pump - 1]["pin"]
 
@@ -265,9 +274,14 @@ class Interface:
             ADCPi: ADCPi number (first ADCPi means self.adcs[0])
             pin: physical pin on the ADCPi
         """
-        assert vial_number in self.vials, f"Vial, {vial_number} is not in the available vials: {self.vials}"
+        assert (
+            vial_number in self.vials
+        ), f"Vial, {vial_number} is not in the available vials: {self.vials}"
 
-        return self.weight_sensors[vial_number - 1]["ADCPi"], self.weight_sensors[vial_number - 1]["pin"]
+        return (
+            self.weight_sensors[vial_number - 1]["ADCPi"],
+            self.weight_sensors[vial_number - 1]["pin"],
+        )
 
     def _OD_to_pin(self, vial_number: int) -> int:
         """Returns the ADCPi and pin number of the OD associated to the vial.
@@ -279,7 +293,9 @@ class Interface:
             ADCPi: ADCPi number (first ADCPi means self.adcs[0])
             pin: physical pin on the ADCPi
         """
-        assert vial_number in self.vials, f"Vial, {vial_number} is not in the available vials: {self.vials}"
+        assert (
+            vial_number in self.vials
+        ), f"Vial, {vial_number} is not in the available vials: {self.vials}"
 
         return self.ODs[vial_number - 1]["ADCPi"], self.ODs[vial_number - 1]["pin"]
 
@@ -293,9 +309,12 @@ class Interface:
         Returns:
             Voltage as measures by the ADCpi.
         """
-        assert adcpi in list(range(1, len(self.adcs) + 1)
-                             ), f"ADCPi {adcpi} isn't in define ADCs: {list(range(1,len(self.adcs)+1))}"
-        assert adc_pin in list(range(1, 9)), f"ADC pin {adc_pin} isn't in available pins {list(range(1,9))}"
+        assert adcpi in list(
+            range(1, len(self.adcs) + 1)
+        ), f"ADCPi {adcpi} isn't in define ADCs: {list(range(1,len(self.adcs)+1))}"
+        assert adc_pin in list(
+            range(1, 9)
+        ), f"ADC pin {adc_pin} isn't in available pins {list(range(1,9))}"
 
         return self.adcs[adcpi - 1].read_voltage(adc_pin)
 
